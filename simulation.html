@@ -1,0 +1,57 @@
+<html>
+<head>
+  <title></title>
+  <style>
+    body { font-family:Arial; font-size: 1em; margin:0; line-height:1.5em; background:#F6F6F6; }
+
+    #wrapper {
+      width:800px; margin:auto; margin-top:4em; border:1px solid #CCC;
+    }
+    #canvas {
+      width:800px;
+      height:400px;
+      background: #FFF;
+    }
+  </style>
+</head>
+<body>
+
+<div id="wrapper">
+  <canvas id="canvas" width="800" height="400"></canvas>
+</div>
+
+<!-- JQuery is necessary -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+<!-- Including the library -->
+<script type="text/javascript" src="bot.js"></script>
+
+<!-- After the DOM is ready, we can instantiate a SliderDiv object -->
+<script type="text/javascript">
+$(document).ready(function() {
+
+  GameEngine.init();
+
+  for (var i = 0; i < 10; i++) {
+    var position = GraphicManager.getRandomBoardPosition();
+    GraphicManager.addGraphic('bot', {
+      x : position.x,
+      y : position.y
+    });  
+  };
+
+  for (var i = 0; i < 10; i++) {  
+    var position = GraphicManager.getRandomBoardPosition();
+    GraphicManager.addGraphic('puck', {
+      x : position.x,
+      y : position.y
+    });  
+  };
+  
+
+  GameEngine.start();
+
+});
+</script>
+</body>
+</html>
