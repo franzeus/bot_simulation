@@ -48,14 +48,16 @@ $(document).ready(function() {
   for (var i = 0; i < 10; i++) {
     var position = GraphicManager.getRandomBoardPosition();
     GraphicManager.addGraphic('bot', {
+      id: i,
       x : position.x,
       y : position.y
     });  
   };
 
-  for (var i = 0; i < 20; i++) {  
+  for (var i = 0; i < 20; i++) {
     var position = GraphicManager.getRandomBoardPosition();
     GraphicManager.addGraphic('puck', {
+      id: i,
       x : position.x,
       y : position.y
     });

@@ -94,6 +94,8 @@ var GameEngine = {
 
         this.canvas = document.getElementById('canvas');
         this.ctx    = this.canvas.getContext('2d');
+
+        jQuery(this.canvas).on('click', jQuery.proxy(GraphicManager.handleClick, GraphicManager));
     
     },
 
@@ -121,6 +123,7 @@ var GameEngine = {
 
         for (i = 0; i < len; i++) {
 
+            // Improve performance, by only checking bot-collisions
             if (graphics[i].type === 'bot') {
                 GameEngine.checkCollision(graphics[i])
             }
@@ -137,8 +140,9 @@ var GameEngine = {
             len = graphics.length,
             i = 0;
 
-        for (i = 0; i < len; i++) {     
-            if(graphic.isCollidingWith(graphics[i])) {          
+        for (i = 0; i < len; i++) {
+            // A bot collided with other object
+            if(graphic.isCollidingWith(graphics[i])) {
                 graphic.collidedWith(graphics[i]);
                 graphics[i].collidedWith(graphic);
             }
@@ -150,6 +154,22 @@ var GameEngine = {
 var GraphicManager = {
 
     graphics : [],
+
+    handleClick : function(e) {
+        this.mouseX = e.pageX - jQuery('#canvas').offset().left;
+        this.mouseY = e.pageY - jQuery('#canvas').offset().top;
+
+        var graphics = this.graphics,
+            len = graphics.length,
+            i = 0;  
+
+        for (i = 0; i < len; i++) {
+            if (isWithinArea(this.mouseX, this.mouseY, graphics[i])) {
+                graphics[i].selected();       
+            }
+        }
+
+    },
 
     reset : function() {        
         var graphics = this.graphics,
@@ -188,8 +208,8 @@ var GraphicManager = {
 
     getRandomBoardPosition : function() {
 
-        var x = getRandomInt(10, Board.width - Board.borderOffset),
-            y = getRandomInt(10, Board.height - Board.borderOffset);
+        var x = getRandomInt(Board.borderOffset, Board.width - Board.borderOffset),
+            y = getRandomInt(Board.borderOffset, Board.height - Board.borderOffset);
 
         return { x: x , y: y};
     },
@@ -392,6 +412,10 @@ Bot.prototype = {
             self.hasPuck = false;
             self.color = self.defaultColor;
         }, 500);
+    },
+
+    selected : function() {
+        console.log(this);
     }
 
 }
@@ -447,6 +471,10 @@ Puck.prototype = {
         } else {
             this.isTaken = false;
         }
+    },
+
+    selected : function() {
+        console.log(this.id);
     }
 
 
