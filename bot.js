@@ -113,6 +113,7 @@ var GameEngine = {
         for (i = 0; i < len; i++) {          
             if(graphic.isCollidingWith(graphics[i])) {            
                 graphic.collidedWith(graphics[i]);
+                graphics[i].collidedWith(graphic);
             }
         }
     }
@@ -359,6 +360,10 @@ Puck.prototype = {
             this.x += this.bot.vx * this.bot.speed;
             this.y += this.bot.vy * this.bot.speed;
         }
+    },
+
+    collidedWith : function(obj) {
+
     },
 
     isTakenBy : function(_bot) {
