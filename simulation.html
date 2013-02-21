@@ -32,7 +32,7 @@ $(document).ready(function() {
 
   GameEngine.init();
 
-  for (var i = 0; i < 10; i++) {
+  for (var i = 0; i < 5; i++) {
     var position = GraphicManager.getRandomBoardPosition();
     GraphicManager.addGraphic('bot', {
       x : position.x,
@@ -40,12 +40,12 @@ $(document).ready(function() {
     });  
   };
 
-  for (var i = 0; i < 10; i++) {  
+  for (var i = 0; i < 20; i++) {  
     var position = GraphicManager.getRandomBoardPosition();
     GraphicManager.addGraphic('puck', {
       x : position.x,
       y : position.y
-    });  
+    });
   };
   
 

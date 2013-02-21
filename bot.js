@@ -221,6 +221,8 @@ var Bot = function(_options) {
     this.hasPuck = false;
     this.puck = null;
     this.pucks = [];
+
+    this.setRandomDirection();
 }
 
 Bot.prototype = {
@@ -274,6 +276,7 @@ Bot.prototype = {
 
     isCollidingWith : function(obj) {
 
+        // Cant collide with itself
         if(this === obj) {
             return false;
         }
@@ -295,25 +298,34 @@ Bot.prototype = {
 
         if (obj.type === 'puck') {
             
-            if (!this.hasPuck) {
-                this.hasPuck = true;
-                obj.isTakenBy(this);
-            }
+            this.handlePuck(obj);
 
         } else if (obj.type === 'bot') {
-            this.vx = -this.vx;
-            this.vy = -this.vy;
+            this.inverseDirection();
         }
 
-        // Collides with item
-            // -> pick up if has none            
-            // -> drop if has one
+    },
 
-        // Collides with other Bot
-            // -> turn 180 around
+    inverseDirection : function() {
+        this.setVector(-this.vx, -this.vy);
     },
 
     getRandomDirection : function() {
+        var x = getRandomInt(-10, 10),
+            y = getRandomInt(-10, 10);
+
+        return { x: x, y: y}
+    },
+
+    setRandomDirection : function() {
+        
+        var self = this;
+
+        setInterval(function() {
+            var newPos = self.getRandomDirection();
+            self.setVector(newPos.x, newPos.y);
+        }, getRandomInt(2000, 10000));
+
 
     },
 
@@ -322,8 +334,43 @@ Bot.prototype = {
         this.vy = vy;
     },
 
-    setIsFull : function(_state) {
-        this.isFull = _state;
+    handlePuck : function(puck) {
+
+        // Already picked up puck
+        if( this.pucks[0] === puck) {
+            return false;
+        }
+
+        // Collect puck if has none and puck is free
+        if (!this.hasPuck && !puck.isTaken) {
+            this.hasPuck = true;
+            puck.isTakenBy(this);
+            this.pucks.push(puck);
+
+        // drop if has puck collided with free puck
+        } else if (this.hasPuck && !puck.isTaken) {
+            this.inverseDirection();
+            this.dropPuck(puck);
+        }
+    },
+
+    dropPuck : function(puck) {
+        
+        var currentPuck = this.pucks[0];
+        currentPuck.isTakenBy(null);
+
+        if(this.pucks.length > 0) {
+            var directionX = this.vx > 0 ? -1 : 1,
+                directionY = this.vy > 0 ? -1 : 1;
+            currentPuck.x = puck.x + puck.width + (getRandomInt(5, 10) * directionX);
+            currentPuck.y = puck.y + puck.height + (getRandomInt(5, 10) * directionY);
+        }
+
+        var self = this;
+        setTimeout(function(){
+            self.pucks = [];
+            self.hasPuck = false;
+        }, 500);
     }
 
 }
@@ -340,12 +387,14 @@ var Puck = function(_options) {
     this.isVisible = true;
     this.isTaken = false;
     this.bot = null;
+
+    this.color = '#'+Math.floor(Math.random()*16777215).toString(16);
 }
 
 Puck.prototype = {
 
     shape : function() {
-        GameEngine.ctx.fillStyle = "#FFC200";
+        GameEngine.ctx.fillStyle = this.color;
         GameEngine.ctx.fillRect(this.x, this.y, this.width, this.height);
     },
 
@@ -357,6 +406,9 @@ Puck.prototype = {
 
     update : function() {
         if(this.isTaken) {
+            this.x = this.bot.x + (this.bot.width / 2);
+            this.y = this.bot.y + (this.bot.height / 2);
+
             this.x += this.bot.vx * this.bot.speed;
             this.y += this.bot.vy * this.bot.speed;
         }
@@ -371,6 +423,8 @@ Puck.prototype = {
 
         if(_bot) {
             this.isTaken = true;
+        } else {
+            this.isTaken = false;
         }
     }
 
