@@ -33,6 +33,33 @@ function getRandomInt (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function isWithinArea (x, y, obj) {
+
+    if( x >= obj.x &&
+        x <= obj.x + obj.width &&
+        y >= obj.y &&
+        y < obj.y + obj.height)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+function distanceBetweenSelfAndObject (self, obj) {
+
+    objCenterX  = obj.x + (obj.width / 2);
+    objCenterY  = obj.y + (obj.height / 2);
+    selfCenterX = self.x + (self.width / 2);
+    selfCenterY = self.y + (self.height / 2);
+
+    var dX = Math.pow((objCenterX - selfCenterX), 2),
+        dY = Math.pow((objCenterY - selfCenterY), 2),
+        distance = Math.sqrt(dX + dY);
+
+    return distance;
+}
+
 // ----------------------------------
 var Board = {
     width : 800,
@@ -265,33 +292,6 @@ Bot.prototype = {
 
     },
 
-    isWithinArea : function(x, y) {
-
-        if( x >= this.x &&
-            x <= this.x + this.width &&
-            y >= this.y &&
-            y < this.y + this.height)
-        {
-            return true;
-        }
-
-        return false;
-    },
-
-    distanceBetweenSelfAndObject : function(obj) {
-
-        objCenterX = obj.x + (obj.width / 2);
-        objCenterY = obj.y + (obj.height / 2);
-        thisCenterX = this.x + (this.width / 2);
-        thisCenterY = this.y + (this.height / 2);
-
-        var dX = Math.pow((objCenterX - thisCenterX), 2),
-            dY = Math.pow((objCenterY - thisCenterY), 2),
-            distance = Math.sqrt(dX + dY);
-
-        return distance;
-    },
-
     isCollidingWith : function(obj) {
 
         // Can not collide with itself
@@ -299,7 +299,7 @@ Bot.prototype = {
             return false;
         }
 
-        if (this.distanceBetweenSelfAndObject(obj) <= this.width) {
+        if (distanceBetweenSelfAndObject(this, obj) <= this.width) {
             return true;
         }
 
@@ -335,13 +335,12 @@ Bot.prototype = {
 
         setInterval(function() {
 
-            if(self.mode !== 'search') {
+            if(self.mode === 'search') {
                 var newPos = self.getRandomDirection();
                 self.setVector(newPos.x, newPos.y);
             }
 
-        }, getRandomInt(2000, 10000));
-
+        }, getRandomInt(1000, 10000));
 
     },
 
@@ -352,23 +351,27 @@ Bot.prototype = {
 
     handlePuck : function(puck) {
 
-        // Already picked up puck
-        if( this.pucks[0] === puck) {
+        // Is carrying this puck
+        if(this.pucks[0] === puck) {
             return false;
         }
 
-        // Collect puck if has none and puck is free
+        // Collect puck if has none and puck is not taken
         if (!this.hasPuck && !puck.isTaken) {
-            this.hasPuck = true;
-            puck.isTakenBy(this);
-            this.pucks.push(puck);
-            this.color = '#888';
+            this.takePuck(puck);
 
-        // drop if has puck collided with free puck
+        // drop if has puck collided with not taken puck
         } else if (this.hasPuck && !puck.isTaken) {
             this.inverseDirection();
             this.dropPuck(puck);
         }
+    },
+
+    takePuck : function(puck) {
+        this.hasPuck = true;
+        puck.isTakenBy(this);
+        this.pucks.push(puck);
+        this.color = '#888';
     },
 
     dropPuck : function(puck) {
