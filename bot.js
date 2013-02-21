@@ -215,9 +215,9 @@ var GraphicManager = {
     },
 
     // Returns true if obj is within the game board borders
-    positionIsWithinBoard : function(x, y) {
-        var xPosition = (x > Board.borderOffset && x < Board.width - Board.borderOffset),
-            yPosition = (y > Board.borderOffset && y < Board.height - Board.borderOffset);
+    positionIsWithinBoard : function(obj) {
+        var xPosition = (obj.x > Board.borderOffset && obj.x + obj.width < Board.width - Board.borderOffset),
+            yPosition = (obj.y > Board.borderOffset && obj.y + obj.height < Board.height - Board.borderOffset);
         
         return (xPosition && yPosition);
     }
@@ -241,7 +241,7 @@ Graphic.prototype = {
 
     // Returns true if obj is within the game board borders
     isWithinBoard : function() {            
-        return positionIsWithinBoard(this.x, this.y);
+        return positionIsWithinBoard(this);
     },
 
     reset : function() {
@@ -299,7 +299,7 @@ Bot.prototype = {
 
     collidesWithBoardBorder : function() {
         
-        if(GraphicManager.positionIsWithinBoard(this.x, this.y))
+        if(GraphicManager.positionIsWithinBoard(this))
             return false;
 
         if (this.x < Board.borderOffset || this.x + this.width >= Board.width - Board.borderOffset) {
