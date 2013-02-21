@@ -213,6 +213,8 @@ var Bot = function(_options) {
 
     this.width = 20;
     this.height = 20;
+    this.defaultColor = '#333'
+    this.color = this.defaultColor;
 
     this.speed = 0.1;
     this.vx = getRandomInt(0, 10);
@@ -222,13 +224,15 @@ var Bot = function(_options) {
     this.puck = null;
     this.pucks = [];
 
+    this.mode = 'search';
+
     this.setRandomDirection();
 }
 
 Bot.prototype = {
 
     shape : function() {
-        GameEngine.ctx.fillStyle = "#09f";
+        GameEngine.ctx.fillStyle = this.color;
         GameEngine.ctx.fillRect(this.x, this.y, this.width, this.height);
     },
 
@@ -322,8 +326,12 @@ Bot.prototype = {
         var self = this;
 
         setInterval(function() {
-            var newPos = self.getRandomDirection();
-            self.setVector(newPos.x, newPos.y);
+
+            if(self.mode !== 'search') {
+                var newPos = self.getRandomDirection();
+                self.setVector(newPos.x, newPos.y);
+            }
+
         }, getRandomInt(2000, 10000));
 
 
@@ -346,6 +354,7 @@ Bot.prototype = {
             this.hasPuck = true;
             puck.isTakenBy(this);
             this.pucks.push(puck);
+            this.color = '#888';
 
         // drop if has puck collided with free puck
         } else if (this.hasPuck && !puck.isTaken) {
@@ -370,6 +379,7 @@ Bot.prototype = {
         setTimeout(function(){
             self.pucks = [];
             self.hasPuck = false;
+            self.color = self.defaultColor;
         }, 500);
     }
 
