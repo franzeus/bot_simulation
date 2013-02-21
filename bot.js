@@ -110,8 +110,8 @@ var GameEngine = {
             len = graphics.length,
             i = 0;
 
-        for (i = 0; i < len; i++) {          
-            if(graphic.isCollidingWith(graphics[i])) {            
+        for (i = 0; i < len; i++) {     
+            if(graphic.isCollidingWith(graphics[i])) {          
                 graphic.collidedWith(graphics[i]);
                 graphics[i].collidedWith(graphic);
             }
@@ -278,20 +278,28 @@ Bot.prototype = {
         return false;
     },
 
+    distanceBetweenSelfAndObject : function(obj) {
+
+        objCenterX = obj.x + (obj.width / 2);
+        objCenterY = obj.y + (obj.height / 2);
+        thisCenterX = this.x + (this.width / 2);
+        thisCenterY = this.y + (this.height / 2);
+
+        var dX = Math.pow((objCenterX - thisCenterX), 2),
+            dY = Math.pow((objCenterY - thisCenterY), 2),
+            distance = Math.sqrt(dX + dY);
+
+        return distance;
+    },
+
     isCollidingWith : function(obj) {
 
-        // Cant collide with itself
-        if(this === obj) {
+        // Can not collide with itself
+        if (this === obj) {
             return false;
         }
 
-        if(
-            this.isWithinArea(obj.x, obj.y) ||
-            this.isWithinArea(obj.x + obj.width, obj.y) ||
-            this.isWithinArea(obj.x, obj.y + obj.height) ||
-            this.isWithinArea(obj.x + obj.width, obj.y + obj.height)
-           )
-        {
+        if (this.distanceBetweenSelfAndObject(obj) <= this.width) {
             return true;
         }
 
