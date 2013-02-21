@@ -45,7 +45,7 @@ var Board = {
 
     drawBorder : function() {
         GameEngine.ctx.lineWidth = 1;
-        GameEngine.ctx.strokeStyle = '#09f';
+        GameEngine.ctx.strokeStyle = '#CCC';
         GameEngine.ctx.stroke();
         GameEngine.ctx.strokeRect(this.x + this.borderOffset, this.y + this.borderOffset, this.width - (this.borderOffset * 2), this.height - (this.borderOffset * 2));
     }

@@ -2,12 +2,13 @@
 <head>
   <title></title>
   <style>
-    body { font-family:Arial; font-size: 1em; margin:0; line-height:1.5em; background:#F6F6F6; }
+    body { font-family:Arial; font-size: 0.8em; margin:0; line-height:1.5em; background:#F6F6F6; }
 
     #wrapper {
-      width:800px; margin:auto; margin-top:4em; border:1px solid #CCC;
+      width:800px; margin:auto; margin-top:4em; 
     }
     #canvas {
+      border:1px solid #CCC;
       width:800px;
       height:400px;
       background: #FFF;
@@ -18,6 +19,17 @@
 
 <div id="wrapper">
   <canvas id="canvas" width="800" height="400"></canvas>
+
+  <p>
+    The rules:
+    <ul>
+      <li>Each bot can collect 1 puck at a time</li>
+      <li>If a bot collides with another puck, he drops the puck and inverses his direction</li>
+      <li>If a bot collides with another bot, he inverses his direction</li>
+    </ul>
+
+    In the end, the pucks will be accumulated in certain zones. 
+  </p>
 </div>
 
 <!-- JQuery is necessary -->
@@ -32,7 +44,7 @@ $(document).ready(function() {
 
   GameEngine.init();
 
-  for (var i = 0; i < 5; i++) {
+  for (var i = 0; i < 15; i++) {
     var position = GraphicManager.getRandomBoardPosition();
     GraphicManager.addGraphic('bot', {
       x : position.x,
