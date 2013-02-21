@@ -217,7 +217,7 @@ var Bot = function(_options) {
     this.vx = getRandomInt(0, 10);
     this.vy = getRandomInt(0, 10);
 
-    this.isFull = false;
+    this.hasPuck = false;
     this.puck = null;
     this.pucks = [];
 }
@@ -292,10 +292,14 @@ Bot.prototype = {
 
     collidedWith : function(obj) {
 
-        if(obj.type === 'puck') {
-            obj.isTakenBy(this);
+        if (obj.type === 'puck') {
+            
+            if (!this.hasPuck) {
+                this.hasPuck = true;
+                obj.isTakenBy(this);
+            }
 
-        } else if(obj.type === 'bot') {
+        } else if (obj.type === 'bot') {
             this.vx = -this.vx;
             this.vy = -this.vy;
         }
