@@ -60,6 +60,23 @@ function distanceBetweenSelfAndObject (self, obj) {
     return distance;
 }
 
+function getAngleBetweenTwoVectors(v1, v2) {
+
+    var dotProd1 = v1.x * v2.x,
+        dotProd2 = v1.y * v2.y,
+        betragV1 = Math.sqrt( Math.pow(v1.x, 2) + Math.pow(v1.y, 2)),
+        betragV2 = Math.sqrt( Math.pow(v2.x, 2) + Math.pow(v2.y, 2)),
+
+        dotProducts = dotProd1 * dotProd2,
+        betraege = betragV1 * betragV2,
+
+        angle = 360 - (dotProducts / betraege);
+
+        console.log(dotProd1, dotProd2);
+
+    return angle;
+}
+
 // ----------------------------------
 var Board = {
     width : 800,
@@ -272,6 +289,7 @@ var Bot = function(_options) {
     this.pucks = [];
 
     this.mode = 'search';
+    this.angle = 0;
 
     this.setRandomDirection();
 }
@@ -279,8 +297,11 @@ var Bot = function(_options) {
 Bot.prototype = {
 
     shape : function() {
+        GameEngine.ctx.save();
+        //GameEngine.ctx.rotate(this.angle * Math.PI  / 180);
         GameEngine.ctx.fillStyle = this.color;
         GameEngine.ctx.fillRect(this.x, this.y, this.width, this.height);
+        GameEngine.ctx.restore();
     },
 
     draw : function() {
