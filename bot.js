@@ -1,28 +1,28 @@
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
- 
+
 // requestAnimationFrame polyfill by Erik Möller
 // fixes from Paul Irish and Tino Zijdel
- 
+
 (function() {
     var lastTime = 0;
     var vendors = ['ms', 'moz', 'webkit', 'o'];
     for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
         window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
                                    || window[vendors[x]+'CancelRequestAnimationFrame'];
     }
- 
+
     if (!window.requestAnimationFrame)
         window.requestAnimationFrame = function(callback, element) {
             var currTime = new Date().getTime();
             var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
               timeToCall);
             lastTime = currTime + timeToCall;
             return id;
         };
- 
+
     if (!window.cancelAnimationFrame)
         window.cancelAnimationFrame = function(id) {
             clearTimeout(id);
@@ -128,7 +128,7 @@ var Board = {
         GameEngine.ctx.stroke();
         GameEngine.ctx.strokeRect(this.x + this.borderOffset, this.y + this.borderOffset, this.width - (this.borderOffset * 2), this.height - (this.borderOffset * 2));
     }
-}
+};
 
 // ----------------------------------
 var GameEngine = {
@@ -138,7 +138,7 @@ var GameEngine = {
 
     simulationTime : 60,
     timer : null,
-    
+
     graphicManager : null,
 
     init : function() {
@@ -148,7 +148,6 @@ var GameEngine = {
         this.ctx    = this.canvas.getContext('2d');
 
         jQuery(this.canvas).on('click', jQuery.proxy(GraphicManager.handleClick, GraphicManager));
-    
     },
 
     start : function() {
@@ -167,7 +166,7 @@ var GameEngine = {
 
         GameEngine.ctx.clearRect(0, 0, 800, 600);
 
-        Board.drawBorder();    
+        Board.drawBorder();
 
         var graphics = GameEngine.graphicManager.graphics,
             len = graphics.length,
@@ -177,7 +176,7 @@ var GameEngine = {
 
             // Improve performance, by only checking bot-collisions
             if (graphics[i].type === 'bot') {
-                GameEngine.checkCollision(graphics[i])
+                GameEngine.checkCollision(graphics[i]);
             }
 
             graphics[i].update();
@@ -200,7 +199,7 @@ var GameEngine = {
             }
         }
     }
-}
+};
 
 // ----------------------------------
 var GraphicManager = {
@@ -213,17 +212,16 @@ var GraphicManager = {
 
         var graphics = this.graphics,
             len = graphics.length,
-            i = 0;  
+            i = 0;
 
         for (i = 0; i < len; i++) {
             if (isWithinArea(this.mouseX, this.mouseY, graphics[i])) {
-                graphics[i].selected();       
+                graphics[i].selected();
             }
         }
-
     },
 
-    reset : function() {        
+    reset : function() {
         var graphics = this.graphics,
             len = graphics.length,
             i = 0;
@@ -255,7 +253,7 @@ var GraphicManager = {
     },
 
     findGraphicById : function() {
-        
+
     },
 
     getRandomBoardPosition : function() {
@@ -270,10 +268,10 @@ var GraphicManager = {
     positionIsWithinBoard : function(obj) {
         var xPosition = (obj.x > Board.borderOffset && obj.x + obj.width < Board.width - Board.borderOffset),
             yPosition = (obj.y > Board.borderOffset && obj.y + obj.height < Board.height - Board.borderOffset);
-        
+
         return (xPosition && yPosition);
     }
-}
+};
 
 
 // ----------------------------------
@@ -281,7 +279,7 @@ var Graphic = function(_options) {
     this.id = _options.id;
     this.isVisible = true;
     this.shape = null;
-}
+};
 
 Graphic.prototype = {
 
@@ -292,14 +290,14 @@ Graphic.prototype = {
     },
 
     // Returns true if obj is within the game board borders
-    isWithinBoard : function() {            
+    isWithinBoard : function() {
         return positionIsWithinBoard(this);
     },
 
     reset : function() {
 
     }
-}
+};
 
 // ----------------------------------
 var Bot = function(_options) {
@@ -344,7 +342,7 @@ Bot.prototype = {
 
         var centerX = this.x + (this.width / 2),
             centerY = this.y + (this.height / 2);
-        
+
             // Translate to center point       
             GameEngine.ctx.translate(centerX, centerY);
             // Rotate
@@ -377,7 +375,7 @@ Bot.prototype = {
     },
 
     collidesWithBoardBorder : function() {
-        
+
         if(GraphicManager.positionIsWithinBoard(this))
             return false;
 
@@ -408,7 +406,7 @@ Bot.prototype = {
     collidedWith : function(obj) {
 
         if (obj.type === 'puck') {
-            
+
             this.handlePuck(obj);
 
         } else if (obj.type === 'bot') {
@@ -425,11 +423,11 @@ Bot.prototype = {
         var x = getRandomInt(-10, 10),
             y = getRandomInt(-10, 10);
 
-        return { x: x, y: y}
+        return { x: x, y: y };
     },
 
     setRandomDirection : function() {
-        
+
         var self = this;
 
         setInterval(function() {
@@ -474,7 +472,7 @@ Bot.prototype = {
     },
 
     dropPuck : function(puck) {
-        
+
         var currentPuck = this.pucks[0];
         currentPuck.isTakenBy(null);
 
@@ -497,7 +495,7 @@ Bot.prototype = {
         console.log(this);
     }
 
-}
+};
 
 // ----------------------------------
 var Puck = function(_options) {
@@ -513,7 +511,7 @@ var Puck = function(_options) {
     this.bot = null;
 
     this.color = '#'+Math.floor(Math.random()*16777215).toString(16);
-}
+};
 
 Puck.prototype = {
 
@@ -555,6 +553,4 @@ Puck.prototype = {
     selected : function() {
         console.log(this.id);
     }
-
-
-}
+};
