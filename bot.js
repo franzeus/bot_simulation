@@ -489,6 +489,8 @@ Bot.prototype = {
 
     selected : function() {
         console.log(this);
+        var newPos = this.getRandomDirection();
+        this.setVector(newPos.x, newPos.y);
     }
 
 };
