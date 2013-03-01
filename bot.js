@@ -120,7 +120,7 @@ var Board = {
 
     drawBorder : function() {
         GameEngine.ctx.lineWidth = 1;
-        GameEngine.ctx.strokeStyle = '#CCC';
+        GameEngine.ctx.strokeStyle = '#222';
         GameEngine.ctx.stroke();
         GameEngine.ctx.strokeRect(this.x + this.borderOffset, this.y + this.borderOffset, this.width - (this.borderOffset * 2), this.height - (this.borderOffset * 2));
     }
@@ -254,8 +254,8 @@ var GraphicManager = {
 
     getRandomBoardPosition : function() {
 
-        var x = getRandomInt(Board.borderOffset, Board.width - Board.borderOffset),
-            y = getRandomInt(Board.borderOffset, Board.height - Board.borderOffset);
+        var x = getRandomInt(Board.borderOffset + 5, Board.width - Board.borderOffset - 5),
+            y = getRandomInt(Board.borderOffset + 5, Board.height - Board.borderOffset - 5);
 
         return { x: x , y: y};
     },

@@ -2,22 +2,24 @@
 <head>
   <title></title>
   <style>
-    body { font-family:Arial; font-size: 0.8em; margin:0; line-height:1.5em; background:#7EA667; }
+    body { font-family:Arial; font-size: 1em; margin:0; line-height:1.5em; background:#111; color:#09f; }
 
     #wrapper {
       width:800px; margin:auto; margin-top:4em; 
     }
     #canvas {
-      border:1px solid #CCC;
+      border:0px solid #09f;
       width:800px;
       height:400px;
-      background: #F6F6F6;
+      background: #111;
     }
   </style>
 </head>
 <body>
 
 <div id="wrapper">
+  <h1>Bot Simulation</h1>
+
   <canvas id="canvas" width="800" height="400"></canvas>
 
   <p>
@@ -26,6 +28,7 @@
       <li>Each bot can collect 1 item at a time</li>
       <li>If a bot collides with another item, he drops the item and inverses his direction</li>
       <li>If a bot collides with another bot, he inverses his direction</li>
+      <li>If a bot collides with the border, he inverses his direction</li>
     </ul>
 
     After some time, the items will be accumulated in certain areas.<br>
