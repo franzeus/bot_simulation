@@ -318,9 +318,11 @@ var Bot = function(_options) {
     this.hasPuck = false;
     this.puck = null;
     this.pucks = [];
+    this.collectedPucks = 0;
 
     this.mode = 'search';
     this.angle = 0;
+
 
     this.setRandomDirection();
 };
@@ -465,6 +467,7 @@ Bot.prototype = {
         this.hasPuck = true;
         puck.isTakenBy(this);
         this.pucks.push(puck);
+        this.collectedPucks += 1;
     },
 
     dropPuck : function(puck) {
