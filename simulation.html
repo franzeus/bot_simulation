@@ -34,7 +34,8 @@
 </div>
 
 <!-- JQuery is necessary -->
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<!--  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script> -->
+<script type="text/javascript" src="jquery.min.js"></script>
 
 <!-- Including the library -->
 <script type="text/javascript" src="bot.js"></script>
@@ -45,7 +46,7 @@ $(document).ready(function() {
 
   GameEngine.init();
 
-  for (var i = 0; i < 10; i++) {
+  for (var i = 0; i < 1; i++) {
     var position = GraphicManager.getRandomBoardPosition();
     GraphicManager.addGraphic('bot', {
       id: i,
@@ -54,7 +55,7 @@ $(document).ready(function() {
     });  
   };
 
-  for (var i = 0; i < 20; i++) {
+  for (var i = 0; i < 30; i++) {
     var position = GraphicManager.getRandomBoardPosition();
     GraphicManager.addGraphic('puck', {
       id: i,
@@ -63,8 +64,9 @@ $(document).ready(function() {
     });
   };
   
-
   GameEngine.start();
+
+  console.log(getAngleBetweenTwoVectors({x: 0, y: 1}, {x: 1, y: 1}));
 
 });
 </script>

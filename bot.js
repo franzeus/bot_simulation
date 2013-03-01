@@ -62,6 +62,37 @@ function distanceBetweenSelfAndObject (self, obj) {
 
 function getAngleBetweenTwoVectors(v1, v2) {
 
+    var angle = 0;
+
+    if(v2) {
+
+        var dot1 = v1.x * v2.x,
+            dot2 = v1.y * v2.y,
+
+            norm1 = Math.sqrt( (v1.x * v1.x) + (v1.y * v1.y) ),
+            norm2 = Math.sqrt( (v2.x * v2.x) + (v2.y * v2.y) ),
+
+            dots = dot1 + dot2,
+            norm = norm1 * norm2;
+
+        angle = Math.acos(dots / norm);
+
+    } else {
+        angle = Math.acos(v1.y * v1.x);
+    }
+
+    return angle; //Math.round(angle * (Math.PI / 180)); // * (180 / Math.PI));
+}
+
+function getAngleBetweenTwoVectorsInDegree(v1, v2) {
+
+    var angle = getAngleBetweenTwoVectors(v1, v2);
+
+    return Math.round(angle * (Math.PI / 180));
+}
+
+function getAngleBetweenTwoVectors(v1, v2) {
+
     var dotProd1 = v1.x * v2.x,
         dotProd2 = v1.y * v2.y,
         betragV1 = Math.sqrt( Math.pow(v1.x, 2) + Math.pow(v1.y, 2)),
@@ -71,8 +102,6 @@ function getAngleBetweenTwoVectors(v1, v2) {
         betraege = betragV1 * betragV2,
 
         angle = 360 - (dotProducts / betraege);
-
-        console.log(dotProd1, dotProd2);
 
     return angle;
 }
@@ -304,11 +333,32 @@ var Bot = function(_options) {
 
 Bot.prototype = {
 
+    getAngle : function() {
+       var angle = getAngleBetweenTwoVectors({x: this.vx, y: this.vy}, {x: 1, y: 0});
+       return angle;
+    },
+
     shape : function() {
+
         GameEngine.ctx.save();
-        //GameEngine.ctx.rotate(this.angle * Math.PI  / 180);
-        GameEngine.ctx.fillStyle = this.color;
-        GameEngine.ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        var centerX = this.x + (this.width / 2),
+            centerY = this.y + (this.height / 2);
+        
+            // Translate to center point       
+            GameEngine.ctx.translate(centerX, centerY);
+            // Rotate
+            GameEngine.ctx.rotate(this.getAngle());
+            // Translate back
+            GameEngine.ctx.translate(-centerX, -centerY);
+
+            // Draw shape
+            GameEngine.ctx.fillStyle = this.color;
+            GameEngine.ctx.fillRect(this.x, this.y, this.width, this.height);
+            // Draw direction-line
+            GameEngine.ctx.fillStyle = '#FF0000';
+            GameEngine.ctx.fillRect(this.x + (this.width / 2), this.y + (this.height / 2), this.width, 1);
+
         GameEngine.ctx.restore();
     },
 
