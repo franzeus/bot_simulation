@@ -77,6 +77,12 @@ function getAngleBetweenTwoVectors(v1, v2) {
     return angle;
 }
 
+function getDistanceToEdge(width) {
+    var edgeLength = width / 2,
+        c = Math.sqrt( Math.pow(edgeLength, 2) + Math.pow(edgeLength, 2));
+    return c;
+}
+
 // ----------------------------------
 var Board = {
     width : 800,
@@ -277,13 +283,15 @@ var Bot = function(_options) {
 
     this.width = 20;
     this.height = 20;
-    this.defaultColor = '#333'
+    this.defaultColor = '#333';
     this.color = this.defaultColor;
 
     this.speed = 0.1;
     this.vx = getRandomInt(0, 10);
     this.vy = getRandomInt(0, 10);
-
+    // The max distance to the edge of the bounding box
+    this.maxBorderDistance = Math.floor(getDistanceToEdge(this.width));
+    console.log(this.maxBorderDistance);
     this.hasPuck = false;
     this.puck = null;
     this.pucks = [];
@@ -292,7 +300,7 @@ var Bot = function(_options) {
     this.angle = 0;
 
     this.setRandomDirection();
-}
+};
 
 Bot.prototype = {
 
@@ -340,7 +348,7 @@ Bot.prototype = {
             return false;
         }
 
-        if (distanceBetweenSelfAndObject(this, obj) <= this.width) {
+        if (Math.abs(distanceBetweenSelfAndObject(this, obj)) <= this.maxBorderDistance) {
             return true;
         }
 
