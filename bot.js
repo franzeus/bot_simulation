@@ -29,6 +29,10 @@
         };
 }());
 
+function getRandomColor () {
+    return '#' + Math.floor(Math.random()*16777215).toString(16);
+}
+
 function getRandomInt (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -302,8 +306,9 @@ var Bot = function(_options) {
 
     this.width = 20;
     this.height = 20;
-    this.defaultColor = '#333';
+    this.defaultColor = getRandomColor();
     this.color = this.defaultColor;
+    this.directionLineColor = getRandomColor();
 
     this.speed = 0.1;
     this.setVector(getRandomInt(0, 10), getRandomInt(0, 10));
@@ -341,7 +346,7 @@ Bot.prototype = {
             GameEngine.ctx.fillRect(this.x, this.y, this.width, this.height);
 
             // Draw direction-line
-            GameEngine.ctx.fillStyle = '#FF0000';
+            GameEngine.ctx.fillStyle = this.directionLineColor;
             GameEngine.ctx.fillRect(this.x + (this.width / 2), this.y + (this.height / 2), this.width / 2, 1);
 
         GameEngine.ctx.restore();
@@ -460,7 +465,6 @@ Bot.prototype = {
         this.hasPuck = true;
         puck.isTakenBy(this);
         this.pucks.push(puck);
-        this.color = '#888';
     },
 
     dropPuck : function(puck) {
@@ -502,7 +506,7 @@ var Puck = function(_options) {
     this.isTaken = false;
     this.bot = null;
 
-    this.color = '#'+Math.floor(Math.random()*16777215).toString(16);
+    this.color = getRandomColor();
 };
 
 Puck.prototype = {
