@@ -88,22 +88,7 @@ function getAngleBetweenTwoVectorsInDegree(v1, v2) {
 
     var angle = getAngleBetweenTwoVectors(v1, v2);
 
-    return Math.round(angle * (Math.PI / 180));
-}
-
-function getAngleBetweenTwoVectors(v1, v2) {
-
-    var dotProd1 = v1.x * v2.x,
-        dotProd2 = v1.y * v2.y,
-        betragV1 = Math.sqrt( Math.pow(v1.x, 2) + Math.pow(v1.y, 2)),
-        betragV2 = Math.sqrt( Math.pow(v2.x, 2) + Math.pow(v2.y, 2)),
-
-        dotProducts = dotProd1 * dotProd2,
-        betraege = betragV1 * betragV2,
-
-        angle = 360 - (dotProducts / betraege);
-
-    return angle;
+    return angle * (180 / Math.PI);
 }
 
 function getDistanceToEdge(width) {
@@ -314,11 +299,10 @@ var Bot = function(_options) {
     this.color = this.defaultColor;
 
     this.speed = 0.1;
-    this.vx = getRandomInt(0, 10);
-    this.vy = getRandomInt(0, 10);
+    this.setVector(getRandomInt(0, 10), getRandomInt(0, 10));
     // The max distance to the edge of the bounding box
     this.maxBorderDistance = Math.floor(getDistanceToEdge(this.width));
-    console.log(this.maxBorderDistance);
+
     this.hasPuck = false;
     this.puck = null;
     this.pucks = [];
@@ -331,11 +315,6 @@ var Bot = function(_options) {
 
 Bot.prototype = {
 
-    getAngle : function() {
-       var angle = getAngleBetweenTwoVectors({x: this.vx, y: this.vy}, {x: 1, y: 0});
-       return angle;
-    },
-
     shape : function() {
 
         GameEngine.ctx.save();
@@ -346,13 +325,14 @@ Bot.prototype = {
             // Translate to center point       
             GameEngine.ctx.translate(centerX, centerY);
             // Rotate
-            GameEngine.ctx.rotate(this.getAngle());
+            GameEngine.ctx.rotate(this.angle);
             // Translate back
             GameEngine.ctx.translate(-centerX, -centerY);
 
             // Draw shape
             GameEngine.ctx.fillStyle = this.color;
             GameEngine.ctx.fillRect(this.x, this.y, this.width, this.height);
+
             // Draw direction-line
             GameEngine.ctx.fillStyle = '#FF0000';
             GameEngine.ctx.fillRect(this.x + (this.width / 2), this.y + (this.height / 2), this.width, 1);
@@ -376,15 +356,18 @@ Bot.prototype = {
 
     collidesWithBoardBorder : function() {
 
-        if(GraphicManager.positionIsWithinBoard(this))
+        if(GraphicManager.positionIsWithinBoard(this)) {
             return false;
+        }
 
         if (this.x < Board.borderOffset || this.x + this.width >= Board.width - Board.borderOffset) {
-            this.vx = -this.vx;
+            var vx = this.vx * -1;
+            this.setVector(vx, this.vy);
         }
 
         if (this.y < Board.borderOffset || this.y + this.height >= Board.height - Board.borderOffset) {
-            this.vy = -this.vy;
+            var vy = this.vy * -1;
+            this.setVector(this.vx, vy);
         }
 
     },
@@ -444,6 +427,9 @@ Bot.prototype = {
     setVector : function(vx, vy) {
         this.vx = vx;
         this.vy = vy;
+
+        this.angle = getAngleBetweenTwoVectors({x: this.vx, y: this.vy}, {x: 1, y: 0});
+        console.log(this.angle, getAngleBetweenTwoVectorsInDegree({x: this.vx, y: this.vy}, {x: 1, y: 0}));
     },
 
     handlePuck : function(puck) {
