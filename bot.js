@@ -78,23 +78,30 @@ function getAngleBetweenTwoVectors(v1, v2) {
         angle = Math.acos(dots / norm);
 
     } else {
-        angle = Math.acos(v1.y * v1.x);
+        angle = Math.atan2(v1.y, v1.x);
     }
 
-    return angle; //Math.round(angle * (Math.PI / 180)); // * (180 / Math.PI));
+    return angle; // in radian
 }
 
 function getAngleBetweenTwoVectorsInDegree(v1, v2) {
 
-    var angle = getAngleBetweenTwoVectors(v1, v2);
-
-    return angle * (180 / Math.PI);
+    var angle = radionToDegree(getAngleBetweenTwoVectors(v1, v2));
+    return angle;
 }
 
 function getDistanceToEdge(width) {
     var edgeLength = width / 2,
         c = Math.sqrt( Math.pow(edgeLength, 2) + Math.pow(edgeLength, 2));
     return c;
+}
+
+function degreeToRadian(angle) {
+    return angle * (Math.PI / 180);
+}
+
+function radionToDegree(angle) {
+    return angle * (180 / Math.PI);
 }
 
 // ----------------------------------
@@ -335,7 +342,7 @@ Bot.prototype = {
 
             // Draw direction-line
             GameEngine.ctx.fillStyle = '#FF0000';
-            GameEngine.ctx.fillRect(this.x + (this.width / 2), this.y + (this.height / 2), this.width, 1);
+            GameEngine.ctx.fillRect(this.x + (this.width / 2), this.y + (this.height / 2), this.width / 2, 1);
 
         GameEngine.ctx.restore();
     },
@@ -428,8 +435,7 @@ Bot.prototype = {
         this.vx = vx;
         this.vy = vy;
 
-        this.angle = getAngleBetweenTwoVectors({x: this.vx, y: this.vy}, {x: 1, y: 0});
-        console.log(this.angle, getAngleBetweenTwoVectorsInDegree({x: this.vx, y: this.vy}, {x: 1, y: 0}));
+        this.angle = getAngleBetweenTwoVectors({x: this.vx, y: this.vy});
     },
 
     handlePuck : function(puck) {
