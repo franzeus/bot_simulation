@@ -469,18 +469,19 @@ Bot.prototype = {
 
     dropPuck : function(puck) {
 
-        var currentPuck = this.pucks[0];
+        var currentPuck = this.pucks[0],
+            self = this;
         currentPuck.isTakenBy(null);
 
         if(this.pucks.length > 0) {
+            // Change the offset of the drop coordinates a bit
             var directionX = this.vx > 0 ? -1 : 1,
                 directionY = this.vy > 0 ? -1 : 1;
             currentPuck.x = puck.x + puck.width + (getRandomInt(5, 10) * directionX);
             currentPuck.y = puck.y + puck.height + (getRandomInt(5, 10) * directionY);
         }
 
-        var self = this;
-        setTimeout(function(){
+        setTimeout(function () {
             self.pucks = [];
             self.hasPuck = false;
             self.color = self.defaultColor;
@@ -526,6 +527,7 @@ Puck.prototype = {
 
     update : function() {
         if(this.isTaken) {
+            // Sync coordinates to prevent errors in positionating
             this.x = this.bot.x + (this.bot.width / 2);
             this.y = this.bot.y + (this.bot.height / 2);
 
@@ -535,7 +537,7 @@ Puck.prototype = {
     },
 
     collidedWith : function(obj) {
-
+        return;
     },
 
     isTakenBy : function(_bot) {
