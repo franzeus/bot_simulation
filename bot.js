@@ -1,9 +1,17 @@
+/*
+*   Bot Simulation - webarbeit@gmail.com
+*   https://github.com/webarbeit/bot_simulation
+*/
+
+/*
+    ------------------------------------------------------
+    HELPER FUNCTIONS
+*/
+
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-
 // requestAnimationFrame polyfill by Erik Möller
 // fixes from Paul Irish and Tino Zijdel
-
 (function() {
     var lastTime = 0;
     var vendors = ['ms', 'moz', 'webkit', 'o'];
@@ -108,7 +116,11 @@ function radionToDegree(angle) {
     return angle * (180 / Math.PI);
 }
 
-// ----------------------------------
+/*
+    ------------------------------------------------------
+    Board Object
+    defines the area in which the bots and items move
+*/
 var Board = {
     width : 800,
     height : 400,
@@ -123,10 +135,29 @@ var Board = {
         GameEngine.ctx.strokeStyle = '#222';
         GameEngine.ctx.stroke();
         GameEngine.ctx.strokeRect(this.x + this.borderOffset, this.y + this.borderOffset, this.width - (this.borderOffset * 2), this.height - (this.borderOffset * 2));
+    },
+
+    getRandomBoardPosition : function() {
+
+        var x = getRandomInt(this.borderOffset + 5, this.width - this.borderOffset - 5),
+            y = getRandomInt(this.borderOffset + 5, this.height - this.borderOffset - 5);
+
+        return { x: x , y: y};
+    },
+
+    // Returns true if obj is within the game board borders
+    positionIsWithinBoard : function(obj) {
+        var xPosition = (obj.x > this.borderOffset && obj.x + obj.width < this.width - this.borderOffset),
+            yPosition = (obj.y > this.borderOffset && obj.y + obj.height < this.height - this.borderOffset);
+
+        return (xPosition && yPosition);
     }
 };
 
-// ----------------------------------
+/*
+    ------------------------------------------------------
+    GameEngine Object    
+*/
 var GameEngine = {
 
     canvas : null,
@@ -197,7 +228,11 @@ var GameEngine = {
     }
 };
 
-// ----------------------------------
+/*
+    ------------------------------------------------------
+    GraphicManager Object
+    holds and manages all graphics
+*/
 var GraphicManager = {
 
     graphics : [],
@@ -248,24 +283,17 @@ var GraphicManager = {
 
     },
 
-    findGraphicById : function() {
+    findGraphicById : function(id) {
+        var graphics = this.graphics,
+            len = graphics.length,
+            i = 0;
 
-    },
+        for (i = 0; i < len; i++) {
+            if(graphics[i].id === id)
+                return graphics[i];
+        }
 
-    getRandomBoardPosition : function() {
-
-        var x = getRandomInt(Board.borderOffset + 5, Board.width - Board.borderOffset - 5),
-            y = getRandomInt(Board.borderOffset + 5, Board.height - Board.borderOffset - 5);
-
-        return { x: x , y: y};
-    },
-
-    // Returns true if obj is within the game board borders
-    positionIsWithinBoard : function(obj) {
-        var xPosition = (obj.x > Board.borderOffset && obj.x + obj.width < Board.width - Board.borderOffset),
-            yPosition = (obj.y > Board.borderOffset && obj.y + obj.height < Board.height - Board.borderOffset);
-
-        return (xPosition && yPosition);
+        return null;
     }
 };
 
@@ -370,7 +398,7 @@ Bot.prototype = {
 
     collidesWithBoardBorder : function() {
 
-        if(GraphicManager.positionIsWithinBoard(this)) {
+        if(Board.positionIsWithinBoard(this)) {
             return false;
         }
 
@@ -442,6 +470,10 @@ Bot.prototype = {
         this.vx = vx;
         this.vy = vy;
 
+        this.adaptAngle();
+    },
+
+    adaptAngle : function() {
         this.angle = getAngleBetweenTwoVectors({x: this.vx, y: this.vy});
     },
 
