@@ -183,7 +183,7 @@ var GameEngine = {
 
         Board.init(this.canvas.width, this.canvas.height);
 
-        jQuery(this.canvas).on('click', jQuery.proxy(GraphicManager.handleClick, GraphicManager));
+        jQuery(this.canvas).on('click', jQuery.proxy(GraphicManager.handleClickOnGraphic, GraphicManager));
     },
 
     start : function() {
@@ -251,16 +251,17 @@ var GraphicManager = {
 
     init : function() {
         this.botList = jQuery('#botList');
+        this.botList.on('click', jQuery.proxy(GraphicManager.handleClickOnBotListItem, this));
     },
 
     addBotToList : function(bot) {
         var li = jQuery('<li></li>');
-        li.html('Bot ' + bot.id);
+        li.html('Bot ' + bot.id).attr('data-id', bot.id);
 
         this.botList.append(li);
     },
 
-    handleClick : function(e) {
+    handleClickOnGraphic : function(e) {
         this.mouseX = e.pageX - jQuery('#canvas').offset().left;
         this.mouseY = e.pageY - jQuery('#canvas').offset().top;
 
@@ -270,9 +271,30 @@ var GraphicManager = {
 
         for (i = 0; i < len; i++) {
             if (isWithinArea(this.mouseX, this.mouseY, graphics[i])) {
-                graphics[i].selected();
+                this.selected(graphics[i]);
             }
         }
+    },
+
+    selected : function(graphic) {
+        graphic.selected();
+
+        if(graphic.type === 'bot') {
+            this.highlightBotListElement(graphic);
+        }
+    },
+
+    highlightBotListElement : function (graphic) {
+        console.log("here");
+        this.botList.find('li').removeClass('active');
+        this.botList.find('li').eq(graphic.id).addClass('active');
+
+    },
+
+    handleClickOnBotListItem : function(e) {
+        var botId = e.target.getAttribute('data-id'),
+            bot = this.getGraphicById(botId);
+        console.log(bot, botId);
     },
 
     reset : function() {
@@ -307,14 +329,21 @@ var GraphicManager = {
 
     },
 
-    findGraphicById : function(id) {
+    getGraphicById : function(id) {
+        return this.graphics[id];
+    },
+
+    findGraphicById : function(id, type) {
+
         var graphics = this.graphics,
             len = graphics.length,
-            i = 0;
+            i = 0,
+            id = parseInt(id, 10);
 
         for (i = 0; i < len; i++) {
-            if(graphics[i].id === id)
+            if (graphics[i].id === id) {
                 return graphics[i];
+            }
         }
 
         return null;
@@ -326,9 +355,9 @@ var GraphicManager = {
 
         for (i = 0; i < num; i++) {
             var position = Board.getRandomBoardPosition(),
-              id = i + 1;
+                id = this.graphics.length;
 
-            GraphicManager.addGraphic(type, {
+            this.addGraphic(type, {
                 id: id,
                 x : position.x,
                 y : position.y
