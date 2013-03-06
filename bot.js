@@ -122,13 +122,19 @@ function radionToDegree(angle) {
     defines the area in which the bots and items move
 */
 var Board = {
-    width : 800,
-    height : 400,
+
+    width : 1000,
+    height : 600,
     x : 0,
     y : 0,
     centerX : this.width / 2,
     centerY : this.height / 2,
     borderOffset : 20,
+
+    init : function(width, height) {
+        this.width = width;
+        this.height = height;
+    },
 
     drawBorder : function() {
         GameEngine.ctx.lineWidth = 1;
@@ -170,9 +176,12 @@ var GameEngine = {
 
     init : function() {
         this.graphicManager = GraphicManager;
+        this.graphicManager.init();
 
         this.canvas = document.getElementById('canvas');
         this.ctx    = this.canvas.getContext('2d');
+
+        Board.init(this.canvas.width, this.canvas.height);
 
         jQuery(this.canvas).on('click', jQuery.proxy(GraphicManager.handleClick, GraphicManager));
     },
@@ -191,7 +200,7 @@ var GameEngine = {
 
     draw : function() {
 
-        GameEngine.ctx.clearRect(0, 0, 800, 600);
+        GameEngine.ctx.clearRect(0, 0, Board.width, Board.height);
 
         Board.drawBorder();
 
@@ -236,6 +245,20 @@ var GameEngine = {
 var GraphicManager = {
 
     graphics : [],
+    botList : null,
+    botCounter : 0,
+    itemCounter : 0,
+
+    init : function() {
+        this.botList = jQuery('#botList');
+    },
+
+    addBotToList : function(bot) {
+        var li = jQuery('<li></li>');
+        li.html('Bot ' + bot.id);
+
+        this.botList.append(li);
+    },
 
     handleClick : function(e) {
         this.mouseX = e.pageX - jQuery('#canvas').offset().left;
@@ -269,6 +292,7 @@ var GraphicManager = {
 
             case ('bot') :
                 graphic = new Bot(_options);
+                this.addBotToList(graphic);
                 break;
 
             case ('puck') :
@@ -294,6 +318,22 @@ var GraphicManager = {
         }
 
         return null;
+    },
+
+    // Add number of objects
+    addObjects : function (num, type) {
+        var i = 0;
+
+        for (i = 0; i < num; i++) {
+            var position = Board.getRandomBoardPosition(),
+              id = i + 1;
+
+            GraphicManager.addGraphic(type, {
+                id: id,
+                x : position.x,
+                y : position.y
+            });
+        }
     }
 };
 
@@ -326,10 +366,10 @@ Graphic.prototype = {
 // ----------------------------------
 var Bot = function(_options) {
 
+    // Set: id, x, y, color
     jQuery.extend(this, _options);
-    // x, y, color
-    this.isVisible = true;
 
+    this.isVisible = true;
     this.type = 'bot';
 
     this.width = 20;
@@ -350,7 +390,6 @@ var Bot = function(_options) {
 
     this.mode = 'search';
     this.angle = 0;
-
 
     this.setRandomDirection();
 };

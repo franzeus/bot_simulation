@@ -1,17 +1,50 @@
 <html>
 <head>
-  <title></title>
+  <link href='http://fonts.googleapis.com/css?family=Jockey+One' rel='stylesheet' type='text/css'>
+  <title>Bot Simulation</title>
   <style>
-    body { font-family:Arial; font-size: 1em; margin:0; line-height:1.5em; background:#111; color:#09f; }
+    body { font-family: 'Jockey One', sans-serif; font-size: 0.9em; margin:0; line-height:1.5em; background:#111; color:#09f; }
 
     #wrapper {
-      width:800px; margin:auto; margin-top:4em; 
+      width:1000px; margin:auto; margin-top:4em; 
     }
     #canvas {
       border:0px solid #09f;
       width:800px;
       height:400px;
       background: #111 url('assets/subtle_carbon.png');
+      border-radius: 7px;
+    }
+    .left {
+      float:left;
+    }
+    .right {
+      float:right;
+    }
+    .clear {
+      clear:both;
+    }
+    #gameWrapper {
+      overflow: hidden;
+    }
+    #description {
+      overflow: hidden;
+      margin-top:2em;
+    }
+    #botList {
+      margin:0; padding:0;
+      list-style-type: none;
+    }
+    #botList li{
+      margin-top:4px;
+      padding:4px;
+      border-radius: 4px;
+      border: 1px solid #222;
+    }
+    #botList li:hover {
+      cursor: pointer;
+      color:#D98E1A;
+      background:#09f;
     }
   </style>
 </head>
@@ -20,52 +53,45 @@
 <div id="wrapper">
   <h1>Bot Simulation</h1>
 
-  <canvas id="canvas" width="800" height="400"></canvas>
+  <div id="gameWrapper">
+    <div class="left">
+      <canvas id="canvas" width="800" height="400"></canvas>
+    </div>
+    <div class="right" style="width:160px;">
+      <ul id="botList"></ul>
+    </div>
+  </div>
 
-  <p>
-    The rules:
-    <ul>
-      <li>Each bot can collect 1 item at a time</li>
-      <li>If a bot collides with another item, he drops the item and inverses his direction</li>
-      <li>If a bot collides with another bot, he inverses his direction</li>
-      <li>If a bot collides with the border, he inverses his direction</li>
-    </ul>
+  <div id="description" class="clear">
+    <p>
+      The rules:
+      <ul>
+        <li>Each bot can collect 1 item at a time</li>
+        <li>If a bot collides with another item, he drops the item and inverses his direction</li>
+        <li>If a bot collides with another bot, he inverses his direction</li>
+        <li>If a bot collides with the border, he inverses his direction</li>
+      </ul>
 
-    After some time, the items will be accumulated in certain areas.<br>
-    Code at <a href="https://github.com/webarbeit/bot_simulation">github.com</a>
-  </p>
+      After some time, the items will be accumulated in certain areas.<br>
+      Code at <a href="https://github.com/webarbeit/bot_simulation">github.com</a>
+    </p>
+  </div>
 </div>
 
 <!-- JQuery is necessary -->
-<!--  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script> -->
 <script type="text/javascript" src="jquery.min.js"></script>
 
 <!-- Including the library -->
 <script type="text/javascript" src="bot.js"></script>
 
-<!-- After the DOM is ready, we can instantiate a SliderDiv object -->
+<!-- Initialize Game -->
 <script type="text/javascript">
 $(document).ready(function() {
 
   GameEngine.init();
 
-  for (var i = 0; i < 8; i++) {
-    var position = Board.getRandomBoardPosition();
-    GraphicManager.addGraphic('bot', {
-      id: i,
-      x : position.x,
-      y : position.y
-    });  
-  };
-
-  for (var i = 0; i < 30; i++) {
-    var position = Board.getRandomBoardPosition();
-    GraphicManager.addGraphic('puck', {
-      id: i,
-      x : position.x,
-      y : position.y
-    });
-  };
+  GameEngine.graphicManager.addObjects(8, 'bot');
+  GameEngine.graphicManager.addObjects(20, 'puck');
   
   GameEngine.start();
 });
