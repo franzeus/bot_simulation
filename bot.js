@@ -248,10 +248,14 @@ var GraphicManager = {
     botList : null,
     botCounter : 0,
     itemCounter : 0,
+    infoBox : null,
+    observeInterval : null,
 
     init : function() {
         this.botList = jQuery('#botList');
         this.botList.on('click', jQuery.proxy(GraphicManager.handleClickOnBotListItem, this));
+
+        this.infoBox = jQuery('#info');
     },
 
     addBotToList : function(bot) {
@@ -271,6 +275,7 @@ var GraphicManager = {
 
         for (i = 0; i < len; i++) {
             if (isWithinArea(this.mouseX, this.mouseY, graphics[i])) {
+                this.graphics[i].deselect();
                 this.selected(graphics[i]);
             }
         }
@@ -278,23 +283,42 @@ var GraphicManager = {
 
     selected : function(graphic) {
         graphic.selected();
+        this.observeGraphic(graphic);
 
         if(graphic.type === 'bot') {
             this.highlightBotListElement(graphic);
+            this.printInfo(graphic);
         }
     },
 
     highlightBotListElement : function (graphic) {
-        console.log("here");
         this.botList.find('li').removeClass('active');
         this.botList.find('li').eq(graphic.id).addClass('active');
+    },
 
+    printInfo : function(graphic) {
+        var info = graphic.getInfoText();
+        this.infoBox.html(info);
     },
 
     handleClickOnBotListItem : function(e) {
         var botId = e.target.getAttribute('data-id'),
             bot = this.getGraphicById(botId);
-        console.log(bot, botId);
+
+        this.selected(bot);
+    },
+
+    observeGraphic : function(graphic) {
+        var self = this;
+
+        if(this.observeInterval) {
+            clearInterval(this.observeInterval);
+            this.observeInterval = null;
+        }
+
+        this.observeInterval = setInterval(function() {
+            self.printInfo(graphic);
+        }, 100);
     },
 
     reset : function() {
@@ -592,9 +616,22 @@ Bot.prototype = {
     },
 
     selected : function() {
-        console.log(this);
         var newPos = this.getRandomDirection();
         this.setVector(newPos.x, newPos.y);
+    },
+
+    deselect : function() {
+
+    },
+
+    getInfoText : function() {
+        var info = 'Bot ' + this.id;
+        info += '<br>';
+        info += 'X:' + Math.round(this.x);
+        info += '<br>';
+        info += 'Y:' + Math.round(this.y);
+
+        return info;
     }
 
 };
@@ -655,5 +692,9 @@ Puck.prototype = {
 
     selected : function() {
         console.log(this.id);
+    },
+
+    deselect : function() {
+
     }
 };
