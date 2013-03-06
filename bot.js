@@ -274,8 +274,10 @@ var GraphicManager = {
             i = 0;
 
         for (i = 0; i < len; i++) {
+
+            this.graphics[i].deselect();
+
             if (isWithinArea(this.mouseX, this.mouseY, graphics[i])) {
-                this.graphics[i].deselect();
                 this.selected(graphics[i]);
             }
         }
@@ -625,11 +627,14 @@ Bot.prototype = {
     },
 
     getInfoText : function() {
-        var info = 'Bot ' + this.id;
+        var info = 'Bot ' + this.id,
+            hasItem = this.hasPuck ? "yes" : "no";
         info += '<br>';
         info += 'X:' + Math.round(this.x);
         info += '<br>';
         info += 'Y:' + Math.round(this.y);
+        info += '<br>';
+        info += 'Has item: ' + hasItem;
 
         return info;
     }
