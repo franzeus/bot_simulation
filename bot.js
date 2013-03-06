@@ -279,8 +279,12 @@ var GraphicManager = {
 
             if (isWithinArea(this.mouseX, this.mouseY, graphics[i])) {
                 this.selected(graphics[i]);
+                return;
             }
         }
+
+        this.clearObserver();
+        this.clearInfoBox();
     },
 
     selected : function(graphic) {
@@ -294,7 +298,7 @@ var GraphicManager = {
     },
 
     highlightBotListElement : function (graphic) {
-        this.botList.find('li').removeClass('active');
+        this.clearInfoBox();
         this.botList.find('li').eq(graphic.id).addClass('active');
     },
 
@@ -303,24 +307,53 @@ var GraphicManager = {
         this.infoBox.html(info);
     },
 
+    clearInfoBox : function() {
+        this.botList.find('li').removeClass('active');
+        this.infoBox.html('');
+    },
+
     handleClickOnBotListItem : function(e) {
         var botId = e.target.getAttribute('data-id'),
             bot = this.getGraphicById(botId);
 
+        this.deselectAll();
         this.selected(bot);
+    },
+
+    deselectAll : function(graphic) {
+        var self = this;
+
+        this.traverseGraphics(function (graphic) {
+            graphic.deselect.call(graphic);
+        });
+    },
+
+    traverseGraphics : function(callback) {
+
+        var graphics = this.graphics,
+            len = graphics.length,
+            i = 0;
+
+        for (i = 0; i < len; i++) {
+            callback(this.graphics[i]);
+        }
     },
 
     observeGraphic : function(graphic) {
         var self = this;
 
-        if(this.observeInterval) {
-            clearInterval(this.observeInterval);
-            this.observeInterval = null;
-        }
+        this.clearObserver();
 
         this.observeInterval = setInterval(function() {
             self.printInfo(graphic);
         }, 100);
+    },
+
+    clearObserver : function() {
+        if(this.observeInterval) {
+            clearInterval(this.observeInterval);
+            this.observeInterval = null;
+        }
     },
 
     reset : function() {
@@ -433,6 +466,9 @@ var Bot = function(_options) {
     this.color = this.defaultColor;
     this.directionLineColor = getRandomColor();
 
+    this.selectColor = '#D98E1A';
+    this.isSelected = false;
+
     this.speed = 0.1;
     this.setVector(getRandomInt(0, 10), getRandomInt(0, 10));
     // The max distance to the edge of the bounding box
@@ -451,29 +487,43 @@ var Bot = function(_options) {
 
 Bot.prototype = {
 
+    reset : function() {
+        this.isSelected = false;
+        this.color = this.defaultColor;
+    },
+
     shape : function() {
 
-        GameEngine.ctx.save();
+        var ctx = GameEngine.ctx;
+
+        ctx.save();
 
         var centerX = this.x + (this.width / 2),
             centerY = this.y + (this.height / 2);
 
             // Translate to center point       
-            GameEngine.ctx.translate(centerX, centerY);
+            ctx.translate(centerX, centerY);
             // Rotate
-            GameEngine.ctx.rotate(this.angle);
+            ctx.rotate(this.angle);
             // Translate back
-            GameEngine.ctx.translate(-centerX, -centerY);
+            ctx.translate(-centerX, -centerY);
 
             // Draw shape
-            GameEngine.ctx.fillStyle = this.color;
-            GameEngine.ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+
+            // Draw select stroke
+            if (this.isSelected) {
+                ctx.strokeStyle = this.selectColor;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(this.x, this.y, this.width, this.height);
+            }
 
             // Draw direction-line
-            GameEngine.ctx.fillStyle = this.directionLineColor;
-            GameEngine.ctx.fillRect(this.x + (this.width / 2), this.y + (this.height / 2), this.width / 2, 1);
+            ctx.fillStyle = this.directionLineColor;
+            ctx.fillRect(this.x + (this.width / 2), this.y + (this.height / 2), this.width / 2, 1);
 
-        GameEngine.ctx.restore();
+        ctx.restore();
     },
 
     draw : function() {
@@ -552,12 +602,16 @@ Bot.prototype = {
         setInterval(function() {
 
             if(self.mode === 'search') {
-                var newPos = self.getRandomDirection();
-                self.setVector(newPos.x, newPos.y);
+                self.changeToRandomDirection.apply(self);
             }
 
         }, getRandomInt(1000, 10000));
 
+    },
+
+    changeToRandomDirection : function () {
+        var newPos = this.getRandomDirection();
+        this.setVector(newPos.x, newPos.y);
     },
 
     setVector : function(vx, vy) {
@@ -618,12 +672,13 @@ Bot.prototype = {
     },
 
     selected : function() {
-        var newPos = this.getRandomDirection();
-        this.setVector(newPos.x, newPos.y);
+        //this.color = this.selectColor;
+        this.isSelected = true;
     },
 
     deselect : function() {
-
+        this.color = this.defaultColor;
+        this.isSelected = false;
     },
 
     getInfoText : function() {
@@ -701,5 +756,9 @@ Puck.prototype = {
 
     deselect : function() {
 
+    },
+
+    getInfoText : function() {
+        return '';
     }
 };
