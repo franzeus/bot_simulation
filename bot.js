@@ -58,6 +58,28 @@ function isWithinArea (x, y, obj) {
     return false;
 }
 
+function collisionBetweenTwoCircles (obj1, obj2, areSquares) {
+
+    var obj1Radius = obj1.width / 2,
+        obj2Radius = obj1.width / 2;
+
+    if(areSquares) {
+        obj1Radius = getDistanceToEdge(obj1.width);
+        obj2Radius = getDistanceToEdge(obj2.width);
+    }
+
+    var obj1CenterX  = obj1.x + (obj1.width / 2),
+        obj1CenterY  = obj1.y + (obj1.height / 2),
+        obj2CenterX = obj2.x + (obj2.width / 2),
+        obj2CenterY = obj2.y + (obj2.height / 2);
+
+    var r = obj1Radius + obj2Radius,
+        dx = obj1CenterX - obj2CenterX;
+        dy = obj1CenterY - obj2CenterY;
+
+    return r * r > (dx * dx + dy * dy);
+}
+
 function distanceBetweenSelfAndObject (self, obj) {
 
     objCenterX  = obj.x + (obj.width / 2);
@@ -565,7 +587,9 @@ Bot.prototype = {
             return false;
         }
 
-        if (Math.abs(distanceBetweenSelfAndObject(this, obj)) <= this.maxBorderDistance) {
+        // Accurate collision detection is not really important
+        // so just treat it as if it were squares
+        if (collisionBetweenTwoCircles(this, obj, true)) {
             return true;
         }
 
