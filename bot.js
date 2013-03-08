@@ -63,6 +63,7 @@ function collisionBetweenTwoCircles (obj1, obj2, areSquares) {
     var obj1Radius = obj1.width / 2,
         obj2Radius = obj1.width / 2;
 
+    // Radius is the distance of the center point and edge of the square
     if(areSquares) {
         obj1Radius = getDistanceToEdge(obj1.width);
         obj2Radius = getDistanceToEdge(obj2.width);
@@ -587,8 +588,8 @@ Bot.prototype = {
             return false;
         }
 
-        // Accurate collision detection is not really important
-        // so just treat it as if it were squares
+        // Accurate collision detection is not really important here,
+        // so just treat it as if they were circles (and neglect the rotation)
         if (collisionBetweenTwoCircles(this, obj, true)) {
             return true;
         }
