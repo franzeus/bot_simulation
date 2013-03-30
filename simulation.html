@@ -8,13 +8,33 @@
     #wrapper {
       width:1000px; margin:auto; margin-top:4em; 
     }
+
+    #canvasWrapper {
+      position: relative;
+      width:800px; height:400px;
+      overflow: hidden;
+
+    }
+
     #canvas {
+      position: absolute;
+      z-index:1;
       border:0px solid #09f;
       width:800px;
       height:400px;
       background: #111 url('assets/subtle_carbon.png');
       border-radius: 7px;
     }
+
+    #botTraceCanvas {
+      z-index:2;
+      left:0; top:0;
+      position:absolute;
+      width:800px;
+      height:400px;
+      pointer-events: none;
+    }
+
     .left {
       float:left;
     }
@@ -53,6 +73,12 @@
     #info {
       margin-top:2em;
     }
+    button {
+      background:#000;
+      border:1px solid #222;
+      color:#FFBB00;
+      padding:8px;
+    }
   </style>
 </head>
 <body>
@@ -61,12 +87,19 @@
   <h1>Bot Simulation</h1>
 
   <div id="gameWrapper">
-    <div class="left">
+    <div class="left" id="canvasWrapper">
       <canvas id="canvas" width="800" height="400"></canvas>
+      <canvas id="botTraceCanvas" width="800" height="400"></canvas>
     </div>
     <div class="right" style="width:160px;">
       <ul id="botList"></ul>
     </div>
+  </div>
+
+  <div class="controls">
+    <button id="increaseSpeed">+</button>
+    <button id="decreaseSpeed"> - </button>
+    <span id="gameSpeedInfo"></span>
   </div>
   
   <div id="info" class="clear">    
@@ -96,13 +129,34 @@
 
 <!-- Initialize Game -->
 <script type="text/javascript">
+function printGameSpeedInfo() {
+  jQuery('#gameSpeedInfo').html(GameEngine.speed);
+}
+
 $(document).ready(function() {
 
   GameEngine.init();
 
+  BotTrace.init();
+
   GameEngine.graphicManager.addObjects(8, 'bot');
   GameEngine.graphicManager.addObjects(20, 'puck');
-  
+
+
+  jQuery('#increaseSpeed').on('click', function() {
+    if (GameEngine.speed < GameEngine.maxSpeed) {
+      GameEngine.speed += 0.1;
+      printGameSpeedInfo();
+    }
+  });
+
+  jQuery('#decreaseSpeed').on('click', function() {
+    if (GameEngine.speed > 0.2) {
+      GameEngine.speed -= 0.1;
+      printGameSpeedInfo();
+    }
+  });
+
   GameEngine.start();
 });
 </script>

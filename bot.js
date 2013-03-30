@@ -139,6 +139,16 @@ function radionToDegree(angle) {
     return angle * (180 / Math.PI);
 }
 
+function drawLine(ctx, fromX, fromY, toX, toY, color, lineWidth) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY); 
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+    ctx.closePath();
+}
+
 /*
     ------------------------------------------------------
     Board Object
@@ -194,6 +204,8 @@ var GameEngine = {
 
     simulationTime : 60,
     timer : null,
+    speed : 0.1,
+    maxSpeed : 2,
 
     graphicManager : null,
 
@@ -492,7 +504,7 @@ var Bot = function(_options) {
     this.selectColor = '#D98E1A';
     this.isSelected = false;
 
-    this.speed = 0.1;
+    this.speed = 0.4;
     this.setVector(getRandomInt(0, 10), getRandomInt(0, 10));
     // The max distance to the edge of the bounding box
     this.maxBorderDistance = Math.floor(getDistanceToEdge(this.width));
@@ -549,8 +561,10 @@ Bot.prototype = {
             ctx.fillRect(this.x + (this.width / 2), this.y + (this.height / 2), this.width / 2, 1);
 
         ctx.restore();
-
-        this.drawTrace(ctx);
+        
+        if (this.isSelected) {
+            this.drawTrace();
+        }
     },
 
     draw : function() {
@@ -559,49 +573,28 @@ Bot.prototype = {
         }
     },
 
-    drawTrace : function(ctx) {
+    drawTrace : function() {
 
         if (!this.isSelected) {
             return false;
         }
 
-        var i = 0,
-            len = this.trace.length;
+        BotTrace.draw(this.x, this.y, this.getCenter(), this.color);
+    },
 
-        for (i = 0; i < len; i++) {
-            
-            var trace = this.trace[i];
+    getCenter : function() {
+        var centerX = this.x + (this.width / 2),
+            centerY = this.y + (this.height / 2);
 
-            // Draw trace line
-            ctx.fillStyle = this.color;
-            ctx.fillRect(trace.x, trace.y, 1, 1);
-
-        }
+        return { x: centerX, y: centerY };
     },
 
     update : function() {
 
         this.collidesWithBoardBorder();
 
-        this.x += this.vx * this.speed;
-        this.y += this.vy * this.speed;
-
-        if (this.isSelected) {
-
-            var centerX = this.x + (this.width / 2),
-                centerY = this.y + (this.height / 2),
-                traceLastIndex = this.trace.length - 1,
-                lastTracePoint = this.trace[traceLastIndex];
-
-            // Check if same last trace point, does not get added twice
-            if (lastTracePoint) {
-                if (lastTracePoint.x === centerX && lastTracePoint.y === centerY) {
-                    return;
-                }
-            }
-
-            this.trace.push({ x: centerX, y: centerY });
-        }
+        this.x += this.vx * GameEngine.speed;
+        this.y += this.vy * GameEngine.speed;
 
     },
 
@@ -746,17 +739,17 @@ Bot.prototype = {
     deselect : function() {
         this.color = this.defaultColor;
         this.isSelected = false;
-        this.trace = [];
+        BotTrace.clear();
     },
 
     getInfoText : function() {
         var info = 'Bot ' + this.id,
             hasItem = this.hasPuck ? "yes" : "no";
         info += '<br>';
-        info += 'X:' + Math.round(this.x);
+        /*info += 'X:' + Math.round(this.x);
         info += '<br>';
         info += 'Y:' + Math.round(this.y);
-        info += '<br>';
+        info += '<br>';*/
         info += 'Has item: ' + hasItem;
 
         return info;
@@ -828,5 +821,44 @@ Puck.prototype = {
 
     getInfoText : function() {
         return '';
+    }
+};
+
+var BotTrace = {
+
+    canvas : null,
+    ctx : null,
+
+    trace : [],
+    currentColor : '#FFFFFF',
+
+    init : function() {
+        this.canvas = document.getElementById('botTraceCanvas');
+        this.ctx    = this.canvas.getContext('2d');
+    },
+
+    addPoint : function(point) {
+
+        var traceLastIndex = this.trace.length - 1,
+            lastTracePoint = this.trace[traceLastIndex];
+
+        // Check if same last trace point, does not get added twice
+        if (lastTracePoint) {
+            if (lastTracePoint.x === centerX && lastTracePoint.y === centerY) {
+                return;
+            }
+        }
+
+        this.trace.push(point);
+    },
+
+    clear : function() {
+        this.canvas.width = this.canvas.width;
+        this.trace = [];
+    },
+
+    draw : function(x, y, center, color) {
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(center.x, center.y, 1, 1);
     }
 };
