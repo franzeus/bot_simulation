@@ -479,6 +479,8 @@ var Bot = function(_options) {
     this.pucks = [];
     this.collectedPucks = 0;
 
+    this.trace = [];
+
     this.mode = 'search';
     this.angle = 0;
 
@@ -524,11 +526,33 @@ Bot.prototype = {
             ctx.fillRect(this.x + (this.width / 2), this.y + (this.height / 2), this.width / 2, 1);
 
         ctx.restore();
+
+        this.drawTrace(ctx);
     },
 
     draw : function() {
         if(this.isVisible) {
             this.shape();
+        }
+    },
+
+    drawTrace : function(ctx) {
+
+        if (!this.isSelected) {
+            return false;
+        }
+
+        var i = 0,
+            len = this.trace.length;
+
+        for (i = 0; i < len; i++) {
+            
+            var trace = this.trace[i];
+
+            // Draw trace line
+            ctx.fillStyle = this.color;
+            ctx.fillRect(trace.x, trace.y, 1, 1);
+
         }
     },
 
@@ -538,6 +562,24 @@ Bot.prototype = {
 
         this.x += this.vx * this.speed;
         this.y += this.vy * this.speed;
+
+        if (this.isSelected) {
+
+            var centerX = this.x + (this.width / 2),
+                centerY = this.y + (this.height / 2),
+                traceLastIndex = this.trace.length - 1,
+                lastTracePoint = this.trace[traceLastIndex];
+
+            // Check if same last trace point, does not get added twice
+            if (lastTracePoint) {
+                if (lastTracePoint.x === centerX && lastTracePoint.y === centerY) {
+                    return;
+                }
+            }
+
+            this.trace.push({ x: centerX, y: centerY });
+        }
+
     },
 
     collidesWithBoardBorder : function() {
@@ -679,6 +721,7 @@ Bot.prototype = {
     deselect : function() {
         this.color = this.defaultColor;
         this.isSelected = false;
+        this.trace = [];
     },
 
     getInfoText : function() {
