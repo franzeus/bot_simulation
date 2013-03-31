@@ -124,35 +124,85 @@
 <!-- JQuery is necessary -->
 <script type="text/javascript" src="jquery.min.js"></script>
 
-<!-- Including the library -->
-<script type="text/javascript" src="bot.js"></script>
+<!-- Including the game engine -->
+<script type="text/javascript" src="../game_engine/js/engine/utils.js"></script>
+<script type="text/javascript" src="../game_engine/js/engine/shape.js"></script>
+<script type="text/javascript" src="../game_engine/js/engine/graphic.js"></script>
+<script type="text/javascript" src="../game_engine/js/engine/world.js"></script>
+<script type="text/javascript" src="../game_engine/js/engine/objectManager.js"></script>
+<script type="text/javascript" src="../game_engine/js/engine/game.js"></script>
+
+<!-- Including the game objects -->
+<script type="text/javascript" src="src/bot/botlist.js"></script>
+<script type="text/javascript" src="src/bot/bot.js"></script>
+<script type="text/javascript" src="src/bot/puck.js"></script>
+<script type="text/javascript" src="src/bot/bottrace.js"></script>
 
 <!-- Initialize Game -->
 <script type="text/javascript">
+
 function printGameSpeedInfo() {
-  jQuery('#gameSpeedInfo').html(GameEngine.speed);
-}
+  jQuery('#gameSpeedInfo').html(GameEngine.ENV.speed);
+};
+
+function addBots(num) {
+
+  var i = 0,
+      objectManager = GameEngine.objectManager;
+
+  for (i = 0; i < num; i++) {
+
+      var position = World.getRandomBoardPosition(),
+          id = objectManager.objects.length,
+          bot = new Bot({
+            id: id,
+            x : position.x,
+            y : position.y
+          });
+
+      objectManager.addObject(bot);
+      BotList.addBotToList(bot);
+  }
+};
+
+function addItems(num) {
+
+  var i = 0,
+      objectManager = GameEngine.objectManager;
+
+  for (i = 0; i < num; i++) {
+
+      var position = World.getRandomBoardPosition(),
+          id = objectManager.objects.length,
+          item = new Puck({
+            id: id,
+            x : position.x,
+            y : position.y
+          });
+
+      objectManager.addObject(item);
+  }
+};
 
 $(document).ready(function() {
 
-  GameEngine.init();
-
+  GameEngine.init('canvas', true);
   BotTrace.init();
+  BotList.init();
 
-  GameEngine.graphicManager.addObjects(8, 'bot');
-  GameEngine.graphicManager.addObjects(20, 'puck');
-
+  addBots(9);
+  addItems(20);
 
   jQuery('#increaseSpeed').on('click', function() {
-    if (GameEngine.speed < GameEngine.maxSpeed) {
-      GameEngine.speed += 0.1;
+    if (GameEngine.ENV.speed < GameEngine.ENV.maxSpeed) {
+      GameEngine.ENV.speed += 0.1;
       printGameSpeedInfo();
     }
   });
 
   jQuery('#decreaseSpeed').on('click', function() {
-    if (GameEngine.speed > 0.2) {
-      GameEngine.speed -= 0.1;
+    if (GameEngine.ENV.speed > 0.2) {
+      GameEngine.ENV.speed -= 0.1;
       printGameSpeedInfo();
     }
   });
